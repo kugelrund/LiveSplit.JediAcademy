@@ -24,8 +24,9 @@ init
 	if (game.MainModule.ModuleMemorySize == 14618624 ||
 	    game.MainModule.FileVersionInfo.ProductName == "Speed Academy")
 	{
-		if (game.MainModule.FileVersionInfo.FileMajorPart >= 0 &&
-		    game.MainModule.FileVersionInfo.FileMinorPart >= 9)
+		if (game.MainModule.FileVersionInfo.FileMajorPart > 0 ||
+		    (game.MainModule.FileVersionInfo.FileMajorPart == 0 &&
+		     game.MainModule.FileVersionInfo.FileMinorPart >= 9))
 		{
 			version = "Speed Academy v0.9";
 		}
