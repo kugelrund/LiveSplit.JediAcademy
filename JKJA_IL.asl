@@ -11,7 +11,7 @@ state("jasp", "Speed Academy v0.9")
 	bool isLoaded   : 0x54B48C;
 	bool finalSplit : 0x5E9058;
 	int  mapNumber  : 0x53DAA8;
-	int  IL_counter : 0x543FC0;
+	int  IL_counter : 0x53F388, 0x1648;
 }
 
 init
