@@ -57,8 +57,8 @@ init
 		{
 			version = "Speed Academy v1.5";
 		}
-		if (game.MainModule.FileVersionInfo.FileMajorPart == 1 &&
-		    game.MainModule.FileVersionInfo.FileMinorPart >= 3)
+		else if (game.MainModule.FileVersionInfo.FileMajorPart == 1 &&
+		         game.MainModule.FileVersionInfo.FileMinorPart >= 3)
 		{
 			version = "Speed Academy v1.3";
 		}
