@@ -47,13 +47,25 @@ state("jasp", "Speed Academy v1.5")
 	int  mapNumber  : 0x542AC8;
 }
 
+state("jasp", "Speed Academy v1.6 (IGT)")
+{
+	int  ingameTime : 0xC1C8B4;
+	bool finalSplit : 0xC1C8BC;
+	int  mapNumber  : 0x543B48;
+}
+
 init
 {
 	if (game.MainModule.ModuleMemorySize == 14618624 ||
 	    game.MainModule.FileVersionInfo.ProductName == "Speed Academy")
 	{
 		if (game.MainModule.FileVersionInfo.FileMajorPart == 1 &&
-		    game.MainModule.FileVersionInfo.FileMinorPart >= 5)
+		    game.MainModule.FileVersionInfo.FileMinorPart >= 6)
+		{
+			version = "Speed Academy v1.6 (IGT)";
+		}
+		else if (game.MainModule.FileVersionInfo.FileMajorPart == 1 &&
+		         game.MainModule.FileVersionInfo.FileMinorPart >= 5)
 		{
 			version = "Speed Academy v1.5";
 		}
@@ -99,20 +111,40 @@ split
 
 start
 {
+	if (version.EndsWith("(IGT)"))
+	{
+		return old.ingameTime == 0 && current.ingameTime != 0;
+	}
 	return (current.isLoaded && !old.isLoaded) && current.mapNumber == 24;
 }
 
 reset
 {
+	if (version.EndsWith("(IGT)"))
+	{
+		return current.ingameTime == 0;
+	}
     return current.mapNumber == 24 && old.mapNumber != 24;
 }
 
 isLoading
 {
-    return !current.isLoaded;
+	if (version.EndsWith("(IGT)"))
+	{
+		return true;
+	}
+	return !current.isLoaded;
 }
 
 exit
 {
     timer.IsGameTimePaused = true;
+}
+
+gameTime
+{
+	if (version.EndsWith("(IGT)"))
+	{
+		return TimeSpan.FromMilliseconds(current.ingameTime);
+	}
 }
