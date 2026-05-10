@@ -68,13 +68,49 @@ state("jasp", "Speed Academy v1.8 (IGT)")
 	int  mapNumber  : 0x548778;
 }
 
+state("jasp", "Speed Academy Automatic (IGT)")
+{
+}
+
+update
+{
+	if (version == "Speed Academy Automatic (IGT)")
+	{
+		current.mapNumber = memory.ReadValue<int>((IntPtr)vars.mapNumberAddress);
+		current.ingameTime = memory.ReadValue<int>((IntPtr)vars.ingameTimeAddress);
+		current.finalSplit = memory.ReadValue<bool>((IntPtr)vars.finalSplitAddress);
+	}
+}
+
 init
 {
 	if (game.MainModule.ModuleMemorySize == 14618624 ||
 	    game.MainModule.FileVersionInfo.ProductName == "Speed Academy")
 	{
-		if (game.MainModule.FileVersionInfo.FileMajorPart == 1 &&
-		    game.MainModule.FileVersionInfo.FileMinorPart >= 8)
+		var scanner = new SignatureScanner(
+			game, game.MainModule.BaseAddress, game.MainModule.ModuleMemorySize
+		);
+		var magic_id = new byte[] {
+			0x6D, 0x61, 0x67, 0x69, 0x63, 0x20,                    // magic
+			0x69, 0x64, 0x20,                                      // id
+			0x66, 0x6F, 0x72, 0x20,                                // for
+			0x73, 0x70, 0x65, 0x65, 0x64, 0x72, 0x75, 0x6E, 0x20,  // speedrun
+			0x64, 0x61, 0x74, 0x61, 0x20,                          // data
+			0x66, 0x6F, 0x72, 0x20,                                // for
+			0x6C, 0x69, 0x76, 0x65, 0x73, 0x70, 0x6C, 0x69, 0x74   // livesplit
+		};
+		var ptr = scanner.Scan(new SigScanTarget(magic_id));
+
+		if (ptr != IntPtr.Zero)
+		{
+			version = "Speed Academy Automatic (IGT)";
+			ptr += magic_id.Length;
+			vars.mapNumberAddress = ptr;
+			vars.ingameTimeAddress = vars.mapNumberAddress + 4;
+			vars.finalSplitAddress = vars.ingameTimeAddress + 4;
+		}
+		else if (game.MainModule.FileVersionInfo.FileMajorPart == 1 &&
+		         game.MainModule.FileVersionInfo.FileMinorPart >= 8)
 		{
 			version = "Speed Academy v1.8 (IGT)";
 		}
